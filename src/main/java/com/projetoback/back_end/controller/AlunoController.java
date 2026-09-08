@@ -26,42 +26,58 @@ import com.projetoback.back_end.entity.Aluno;
 
 public class AlunoController {
 
-    private final ConcurrentMap<Long, Aluno> alunos = new ConcurrentHashMap<>();
-    private final AtomicLong proximoId = new AtomicLong(1);
+    List<Aluno> listaAlunos = new ArrayList<Aluno>();
 
     @GetMapping
     public List<Aluno> listar() {
-        return new ArrayList<>(alunos.values());
+        return listaAlunos;
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Aluno> buscar(@PathVariable Long id) {
-        Aluno aluno = alunos.get(id);
+        Aluno aluno = listaAlunos.stream()
+                .filter(a -> a.getId().equals(id))
+                .findFirst()
+                .orElse(null);
         return aluno == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(aluno);
     }
 
     @PostMapping
-    public ResponseEntity<Aluno> criar(@RequestBody Aluno aluno) {
-        aluno.setId(proximoId.getAndIncrement());
-        alunos.put(aluno.getId(), aluno);
-        return ResponseEntity.status(HttpStatus.CREATED).body(aluno);
+    public Aluno criar(@RequestBody Aluno aluno) {
+        listaAlunos.add(aluno);
+        return aluno;
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Aluno> atualizar(@PathVariable Long id, @RequestBody Aluno aluno) {
-        if (!alunos.containsKey(id)) {
+        Aluno alunoExistente = listaAlunos.stream()
+                .filter(a -> a.getId().equals(id))
+                .findFirst()
+                .orElse(null);
+
+        if (alunoExistente == null) {
             return ResponseEntity.notFound().build();
         }
 
         aluno.setId(id);
-        alunos.put(id, aluno);
+        listaAlunos.remove(alunoExistente);
+        listaAlunos.add(aluno);
         return ResponseEntity.ok(aluno);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> remover(@PathVariable Long id) {
-        return alunos.remove(id) == null
-                ? ResponseEntity.notFound().build()
-                : ResponseEntity.noContent().build();
+
+    public ResponseEntity<Void> deletar(@PathVariable Long id) {
+        Aluno alunoExistente = listaAlunos.stream()
+                .filter(a -> a.getId().equals(id))
+                .findFirst()
+                .orElse(null);
+
+        if (alunoExistente == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        listaAlunos.remove(alunoExistente);
+        return ResponseEntity.noContent().build();
     }
 }
