@@ -1,8 +1,5 @@
 package com.aluno.entity;
 
-import org.springframework.lang.Contract;
-import org.springframework.stereotype.Controller;
-
 
 public class Aluno {
     private long id;
@@ -12,13 +9,11 @@ public class Aluno {
     public Aluno() {
     }
     
-    @Contract(pure = true)
     public Aluno(String nome, double nota) {
         this.nome = nome;
         this.nota = nota;
     }
 
-    @Contract(pure = true)
     public Aluno(long id, String nome, double nota) {
         this.id = id;
         this.nome = nome;
