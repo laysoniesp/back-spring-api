@@ -32,5 +32,7 @@ public class Main implements CommandLineRunner {
         Aluno novoAluno = alunoService.criarAluno(nome, nota);
         System.out.println("Aluno criado: " + novoAluno.getNome() + ", Nota: " + novoAluno.getNota());
 
+
+        scanner.close();
     }
 }
